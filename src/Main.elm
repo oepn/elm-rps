@@ -46,6 +46,11 @@ type Sign
     | Scissors
 
 
+signs : List Sign
+signs =
+    [ Rock, Paper, Scissors ]
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -70,8 +75,13 @@ view { matches } =
     div []
         [ h1 [] [ text "Matches" ]
         , ul [] <| map matchResult matches
-        , button [ onClick <| Throw Paper ] [ text "Throw Paper" ]
+        , div [] <| map throwSignButton signs
         ]
+
+
+throwSignButton : Sign -> Html Msg
+throwSignButton sign =
+    button [ onClick <| Throw sign ] [ text (toString sign) ]
 
 
 matchResult : Match -> Html msg
