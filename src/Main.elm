@@ -80,8 +80,8 @@ view : Model -> Html Msg
 view { matches } =
     div []
         [ h1 [] [ text "Matches" ]
-        , ul [] <| map matchResultEntry matches
         , div [] <| map throwSignButton signs
+        , ul [] <| map matchResultEntry matches
         ]
 
 
