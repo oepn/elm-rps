@@ -13,7 +13,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = (\_ -> Sub.none)
         }
 
 
@@ -130,15 +130,6 @@ matchResultEntry ( ( mySign, theirSign ), result ) =
                 ++ " - "
                 ++ toString result
         ]
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
 
 
 
