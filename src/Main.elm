@@ -92,21 +92,25 @@ throwSignButton sign =
 
 matchResultEntry : Match -> Html msg
 matchResultEntry match =
-    li []
-        [ text <|
-            toString (fst match)
-                ++ " vs. "
-                ++ toString (snd match)
-                ++ " - "
-                ++ toString (matchResult match)
-        ]
+    let
+        ( mySign, theirSign ) =
+            match
+    in
+        li []
+            [ text <|
+                toString mySign
+                    ++ " vs. "
+                    ++ toString theirSign
+                    ++ " - "
+                    ++ toString (matchResult match)
+            ]
 
 
 matchResult : Match -> MatchResult
-matchResult ( sign, sign' ) =
-    if (member ( sign, sign' ) winningMatches) then
+matchResult ( mySign, theirSign ) =
+    if (member ( mySign, theirSign ) winningMatches) then
         Win
-    else if (sign == sign') then
+    else if (mySign == theirSign) then
         Draw
     else
         Lose
