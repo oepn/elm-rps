@@ -80,13 +80,13 @@ view : Model -> Html Msg
 view { matches } =
     div []
         [ h1 [] [ text "Matches" ]
-        , div [] <| map throwSignButton signs
+        , div [] <| map signButton signs
         , ul [] <| map matchResultEntry matches
         ]
 
 
-throwSignButton : Sign -> Html Msg
-throwSignButton sign =
+signButton : Sign -> Html Msg
+signButton sign =
     button [ onClick <| Throw sign ] [ text (toString sign) ]
 
 
