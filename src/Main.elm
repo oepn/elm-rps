@@ -46,6 +46,12 @@ type Sign
     | Scissors
 
 
+type MatchResult
+    = Lose
+    | Draw
+    | Win
+
+
 signs : List Sign
 signs =
     [ Rock, Paper, Scissors ]
@@ -74,7 +80,7 @@ view : Model -> Html Msg
 view { matches } =
     div []
         [ h1 [] [ text "Matches" ]
-        , ul [] <| map matchResult matches
+        , ul [] <| map matchResultEntry matches
         , div [] <| map throwSignButton signs
         ]
 
@@ -84,30 +90,32 @@ throwSignButton sign =
     button [ onClick <| Throw sign ] [ text (toString sign) ]
 
 
-matchResult : Match -> Html msg
-matchResult match =
+matchResultEntry : Match -> Html msg
+matchResultEntry match =
     li []
         [ text <|
             toString (fst match)
                 ++ " vs. "
                 ++ toString (snd match)
                 ++ " - "
-                ++ (member match winningMatches ?: ( "You Win", "You Lose" ))
+                ++ toString (matchResult match)
         ]
+
+
+matchResult : Match -> MatchResult
+matchResult ( sign, sign' ) =
+    if (member ( sign, sign' ) winningMatches) then
+        Win
+    else if (sign == sign') then
+        Draw
+    else
+        Lose
+
+
+
+-- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
-
-
-
--- HELPERS
-
-
-(?:) : Bool -> ( String, String ) -> String
-(?:) bool ( trueString, falseString ) =
-    if bool then
-        trueString
-    else
-        falseString
