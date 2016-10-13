@@ -22,7 +22,7 @@ main =
 
 
 type alias Model =
-    { matches : List Match }
+    { matches : List ( Match, MatchResult ) }
 
 
 type alias Match =
@@ -67,7 +67,9 @@ update msg model =
             ( model, randomSign sign )
 
         AddMatch match ->
-            ( { model | matches = match :: model.matches }, Cmd.none )
+            ( { model | matches = ( match, matchResult match ) :: model.matches }
+            , Cmd.none
+            )
 
 
 randomSign : Sign -> Cmd Msg
@@ -81,6 +83,23 @@ randomSign sign =
 makeMatch : Sign -> Int -> Msg
 makeMatch sign i =
     AddMatch ( sign, signs !! (i - 1) ? Rock )
+
+
+matchResult : Match -> MatchResult
+matchResult ( mySign, theirSign ) =
+    let
+        winningMatches =
+            [ ( Rock, Scissors )
+            , ( Paper, Rock )
+            , ( Scissors, Paper )
+            ]
+    in
+        if (member ( mySign, theirSign ) winningMatches) then
+            Win
+        else if (mySign == theirSign) then
+            Draw
+        else
+            Lose
 
 
 
@@ -101,37 +120,16 @@ signButton sign =
     button [ onClick <| ThrowSign sign ] [ text (toString sign) ]
 
 
-matchResultEntry : Match -> Html msg
-matchResultEntry match =
-    let
-        ( mySign, theirSign ) =
-            match
-    in
-        li []
-            [ text <|
-                toString mySign
-                    ++ " vs. "
-                    ++ toString theirSign
-                    ++ " - "
-                    ++ toString (matchResult match)
-            ]
-
-
-matchResult : Match -> MatchResult
-matchResult ( mySign, theirSign ) =
-    let
-        winningMatches =
-            [ ( Rock, Scissors )
-            , ( Paper, Rock )
-            , ( Scissors, Paper )
-            ]
-    in
-        if (member ( mySign, theirSign ) winningMatches) then
-            Win
-        else if (mySign == theirSign) then
-            Draw
-        else
-            Lose
+matchResultEntry : ( Match, MatchResult ) -> Html msg
+matchResultEntry ( ( mySign, theirSign ), result ) =
+    li []
+        [ text <|
+            toString mySign
+                ++ " vs. "
+                ++ toString theirSign
+                ++ " - "
+                ++ toString result
+        ]
 
 
 
