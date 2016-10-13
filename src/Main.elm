@@ -1,9 +1,11 @@
 module Main exposing (..)
 
+import Array exposing (Array)
 import Html exposing (..)
 import Html.App as App
 import Html.Events exposing (..)
 import List exposing (..)
+import Random
 
 
 main =
@@ -37,7 +39,8 @@ init =
 
 
 type Msg
-    = Throw Sign
+    = ThrowSign Sign
+    | AddMatch Match
 
 
 type Sign
@@ -60,8 +63,24 @@ signs =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Throw sign ->
-            ( { model | matches = ( sign, Rock ) :: model.matches }, Cmd.none )
+        ThrowSign sign ->
+            ( model, randomSign sign )
+
+        AddMatch match ->
+            ( { model | matches = match :: model.matches }, Cmd.none )
+
+
+randomSign : Sign -> Cmd Msg
+randomSign sign =
+    signs
+        |> length
+        |> Random.int 1
+        |> Random.generate (makeMatch sign)
+
+
+makeMatch : Sign -> Int -> Msg
+makeMatch sign i =
+    AddMatch ( sign, signs !! (i - 1) ? Rock )
 
 
 winningMatches : List Match
@@ -87,7 +106,7 @@ view { matches } =
 
 signButton : Sign -> Html Msg
 signButton sign =
-    button [ onClick <| Throw sign ] [ text (toString sign) ]
+    button [ onClick <| ThrowSign sign ] [ text (toString sign) ]
 
 
 matchResultEntry : Match -> Html msg
@@ -123,3 +142,17 @@ matchResult ( mySign, theirSign ) =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+
+-- HELPERS
+
+
+(?) : Maybe a -> a -> a
+(?) maybe default =
+    Maybe.withDefault default maybe
+
+
+(!!) : List a -> Int -> Maybe a
+(!!) list i =
+    list |> Array.fromList |> Array.get i
