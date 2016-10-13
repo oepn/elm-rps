@@ -83,14 +83,6 @@ makeMatch sign i =
     AddMatch ( sign, signs !! (i - 1) ? Rock )
 
 
-winningMatches : List Match
-winningMatches =
-    [ ( Rock, Scissors )
-    , ( Paper, Rock )
-    , ( Scissors, Paper )
-    ]
-
-
 
 -- VIEW
 
@@ -127,12 +119,19 @@ matchResultEntry match =
 
 matchResult : Match -> MatchResult
 matchResult ( mySign, theirSign ) =
-    if (member ( mySign, theirSign ) winningMatches) then
-        Win
-    else if (mySign == theirSign) then
-        Draw
-    else
-        Lose
+    let
+        winningMatches =
+            [ ( Rock, Scissors )
+            , ( Paper, Rock )
+            , ( Scissors, Paper )
+            ]
+    in
+        if (member ( mySign, theirSign ) winningMatches) then
+            Win
+        else if (mySign == theirSign) then
+            Draw
+        else
+            Lose
 
 
 
