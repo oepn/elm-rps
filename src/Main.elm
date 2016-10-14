@@ -22,11 +22,15 @@ main =
 
 
 type alias Model =
-    { matches : List ( Match, MatchResult ) }
+    { matches : List MatchSummary }
 
 
 type alias Match =
     ( Sign, Sign )
+
+
+type alias MatchSummary =
+    ( Match, MatchResult )
 
 
 init : ( Model, Cmd Msg )
@@ -110,6 +114,7 @@ view : Model -> Html Msg
 view { matches } =
     div []
         [ h1 [] [ text "Matches" ]
+        , matchResultTotals matches
         , div [] <| map signButton signs
         , ul [] <| map matchResultEntry matches
         ]
@@ -120,7 +125,7 @@ signButton sign =
     button [ onClick <| ThrowSign sign ] [ text (toString sign) ]
 
 
-matchResultEntry : ( Match, MatchResult ) -> Html msg
+matchResultEntry : MatchSummary -> Html msg
 matchResultEntry ( ( mySign, theirSign ), result ) =
     li []
         [ text <|
@@ -130,6 +135,31 @@ matchResultEntry ( ( mySign, theirSign ), result ) =
                 ++ " - "
                 ++ toString result
         ]
+
+
+matchResultTotals : List MatchSummary -> Html msg
+matchResultTotals matches =
+    let
+        updateTotals : MatchSummary -> ( Int, Int, Int ) -> ( Int, Int, Int )
+        updateTotals ( _, result ) ( l, d, w ) =
+            case result of
+                Lose ->
+                    ( l + 1, d, w )
+
+                Draw ->
+                    ( l, d + 1, w )
+
+                Win ->
+                    ( l, d, w + 1 )
+
+        ( lose, draw, win ) =
+            List.foldl updateTotals ( 0, 0, 0 ) matches
+    in
+        div []
+            [ p [] [ text <| "Win: " ++ (toString win) ]
+            , p [] [ text <| "Draw: " ++ (toString draw) ]
+            , p [] [ text <| "Lose: " ++ (toString lose) ]
+            ]
 
 
 
