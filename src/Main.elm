@@ -25,12 +25,24 @@ type alias Model =
     { matches : List MatchSummary }
 
 
+type alias MatchSummary =
+    ( Match, MatchResult )
+
+
 type alias Match =
     ( Sign, Sign )
 
 
-type alias MatchSummary =
-    ( Match, MatchResult )
+type Sign
+    = Rock
+    | Paper
+    | Scissors
+
+
+type MatchResult
+    = Lose
+    | Draw
+    | Win
 
 
 init : ( Model, Cmd Msg )
@@ -45,18 +57,6 @@ init =
 type Msg
     = ThrowSign Sign
     | AddMatch Match
-
-
-type Sign
-    = Rock
-    | Paper
-    | Scissors
-
-
-type MatchResult
-    = Lose
-    | Draw
-    | Win
 
 
 signs : List Sign
