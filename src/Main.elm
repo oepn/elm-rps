@@ -3,6 +3,7 @@ module Main exposing (..)
 import Array exposing (Array)
 import Html exposing (..)
 import Html.App as App
+import Html.Attributes exposing (disabled)
 import Html.Events exposing (..)
 import List exposing (..)
 import Random
@@ -22,7 +23,9 @@ main =
 
 
 type alias Model =
-    { matches : List MatchSummary }
+    { matches : List MatchSummary
+    , matchLimit : Int
+    }
 
 
 type alias MatchSummary =
@@ -47,7 +50,7 @@ type MatchResult
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model [], Cmd.none )
+    ( Model [] 10, Cmd.none )
 
 
 
@@ -111,18 +114,32 @@ matchResult ( mySign, theirSign ) =
 
 
 view : Model -> Html Msg
-view { matches } =
-    div []
-        [ h1 [] [ text "Matches" ]
-        , matchResultTotals matches
-        , div [] <| map signButton signs
-        , ul [] <| map matchResultEntry matches
+view { matches, matchLimit } =
+    let
+        matchCount : Int
+        matchCount =
+            length matches
+    in
+        div []
+            [ h1 []
+                [ text <|
+                    "Matches ("
+                        ++ toString (matchLimit - matchCount)
+                        ++ " remaining)"
+                ]
+            , matchResultTotals matches
+            , div [] <| map (signButton <| matchCount < matchLimit) signs
+            , ul [] <| map matchResultEntry matches
+            ]
+
+
+signButton : Bool -> Sign -> Html Msg
+signButton enabled sign =
+    button
+        [ disabled <| not enabled
+        , onClick <| ThrowSign sign
         ]
-
-
-signButton : Sign -> Html Msg
-signButton sign =
-    button [ onClick <| ThrowSign sign ] [ text (toString sign) ]
+        [ text (toString sign) ]
 
 
 matchResultEntry : MatchSummary -> Html msg
