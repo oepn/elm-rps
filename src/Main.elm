@@ -3,10 +3,11 @@ module Main exposing (..)
 import Array exposing (Array)
 import Html exposing (..)
 import Html.App as App
-import Html.Attributes exposing (disabled)
+import Html.Attributes as Attr exposing (disabled, type', value)
 import Html.Events exposing (..)
 import List exposing (..)
 import Random
+import String
 
 
 main =
@@ -61,6 +62,7 @@ type Msg
     = ThrowSign Sign
     | AddMatch Match
     | Reset
+    | ChangeLimit Int
 
 
 signs : List Sign
@@ -81,6 +83,9 @@ update msg model =
 
         Reset ->
             ( { model | matches = [] }, Cmd.none )
+
+        ChangeLimit limit ->
+            ( { model | matchLimit = Basics.max 0 limit }, Cmd.none )
 
 
 randomSign : Sign -> Cmd Msg
@@ -131,11 +136,23 @@ view { matches, matchLimit } =
                         ++ toString (matchLimit - matchCount)
                         ++ " remaining)"
                 ]
+            , input
+                [ type' "number"
+                , Attr.min "0"
+                , value <| toString matchLimit
+                , onInput handleChangeLimit
+                ]
+                []
             , matchResultTotals matches
             , div [] <| map (signButton <| matchCount < matchLimit) signs
             , button [ onClick Reset ] [ text "Reset" ]
             , ul [] <| map matchResultEntry matches
             ]
+
+
+handleChangeLimit : String -> Msg
+handleChangeLimit =
+    String.toInt >> Result.toMaybe >> Maybe.withDefault 0 >> ChangeLimit
 
 
 signButton : Bool -> Sign -> Html Msg
