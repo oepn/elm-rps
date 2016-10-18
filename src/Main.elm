@@ -152,7 +152,7 @@ view { matches, matchLimit } =
 
 handleChangeLimit : String -> Msg
 handleChangeLimit =
-    String.toInt >> Result.toMaybe >> Maybe.withDefault 0 >> ChangeLimit
+    String.toInt >> Result.withDefault 0 >> ChangeLimit
 
 
 signButton : Bool -> Sign -> Html Msg
