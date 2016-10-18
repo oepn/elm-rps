@@ -60,6 +60,7 @@ init =
 type Msg
     = ThrowSign Sign
     | AddMatch Match
+    | Reset
 
 
 signs : List Sign
@@ -77,6 +78,9 @@ update msg model =
             ( { model | matches = ( match, matchResult match ) :: model.matches }
             , Cmd.none
             )
+
+        Reset ->
+            ( { model | matches = [] }, Cmd.none )
 
 
 randomSign : Sign -> Cmd Msg
@@ -129,6 +133,7 @@ view { matches, matchLimit } =
                 ]
             , matchResultTotals matches
             , div [] <| map (signButton <| matchCount < matchLimit) signs
+            , button [ onClick Reset ] [ text "Reset" ]
             , ul [] <| map matchResultEntry matches
             ]
 
