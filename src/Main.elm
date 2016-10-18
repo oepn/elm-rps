@@ -25,7 +25,7 @@ main =
 
 type alias Model =
     { matches : List MatchSummary
-    , matchLimit : Int
+    , matchLimit : Maybe Int
     }
 
 
@@ -51,7 +51,7 @@ type MatchResult
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model [] 10, Cmd.none )
+    ( Model [] Nothing, Cmd.none )
 
 
 
@@ -62,7 +62,7 @@ type Msg
     = ThrowSign Sign
     | AddMatch Match
     | Reset
-    | ChangeLimit Int
+    | ChangeLimit (Maybe Int)
 
 
 signs : List Sign
@@ -85,7 +85,7 @@ update msg model =
             ( { model | matches = [] }, Cmd.none )
 
         ChangeLimit limit ->
-            ( { model | matchLimit = Basics.max 0 limit }, Cmd.none )
+            ( { model | matchLimit = Maybe.map (max 0) limit }, Cmd.none )
 
 
 randomSign : Sign -> Cmd Msg
@@ -125,6 +125,15 @@ matchResult ( mySign, theirSign ) =
 view : Model -> Html Msg
 view { matches, matchLimit } =
     let
+        stringMatchLimit : String
+        stringMatchLimit =
+            case matchLimit of
+                Just limit ->
+                    toString limit
+
+                Nothing ->
+                    ""
+
         matchCount : Int
         matchCount =
             length matches
@@ -133,18 +142,18 @@ view { matches, matchLimit } =
             [ h1 []
                 [ text <|
                     "Matches ("
-                        ++ toString (matchLimit - matchCount)
+                        ++ toString (matchLimit ? 0 - matchCount)
                         ++ " remaining)"
                 ]
             , input
                 [ type' "number"
                 , Attr.min "0"
-                , value <| toString matchLimit
+                , value stringMatchLimit
                 , onInput handleChangeLimit
                 ]
                 []
             , matchResultTotals matches
-            , div [] <| map (signButton <| matchCount < matchLimit) signs
+            , div [] <| map (signButton <| matchCount < matchLimit ? 0) signs
             , button [ onClick Reset ] [ text "Reset" ]
             , ul [] <| map matchResultEntry matches
             ]
@@ -152,7 +161,7 @@ view { matches, matchLimit } =
 
 handleChangeLimit : String -> Msg
 handleChangeLimit =
-    String.toInt >> Result.withDefault 0 >> ChangeLimit
+    String.toInt >> Result.toMaybe >> ChangeLimit
 
 
 signButton : Bool -> Sign -> Html Msg
