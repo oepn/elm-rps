@@ -2,16 +2,15 @@ module Main exposing (..)
 
 import Array exposing (Array)
 import Html exposing (..)
-import Html.App as App
-import Html.Attributes as Attr exposing (disabled, type', value)
+import Html.Attributes as Attr exposing (disabled, type_, value)
 import Html.Events exposing (..)
-import List exposing (..)
+import List
 import Random
 import String
 
 
 main =
-    App.program
+    Html.program
         { init = init
         , view = view
         , update = update
@@ -91,7 +90,7 @@ update msg model =
 randomSign : Sign -> Cmd Msg
 randomSign sign =
     signs
-        |> length
+        |> List.length
         |> Random.int 1
         |> Random.generate (makeMatch sign)
 
@@ -110,7 +109,7 @@ matchResult ( mySign, theirSign ) =
             , ( Scissors, Paper )
             ]
     in
-        if (member ( mySign, theirSign ) winningMatches) then
+        if (List.member ( mySign, theirSign ) winningMatches) then
             Win
         else if (mySign == theirSign) then
             Draw
@@ -136,7 +135,7 @@ view { matches, matchLimit } =
 
         matchCount : Int
         matchCount =
-            length matches
+            List.length matches
     in
         div []
             [ h1 []
@@ -146,16 +145,16 @@ view { matches, matchLimit } =
                         ++ " remaining)"
                 ]
             , input
-                [ type' "number"
+                [ type_ "number"
                 , Attr.min "0"
                 , value stringMatchLimit
                 , onInput handleChangeLimit
                 ]
                 []
             , matchResultTotals matches
-            , div [] <| map (signButton <| matchCount < matchLimit ? 0) signs
+            , div [] <| List.map (signButton <| matchCount < matchLimit ? 0) signs
             , button [ onClick Reset ] [ text "Reset" ]
-            , ul [] <| map matchResultEntry matches
+            , ul [] <| List.map matchResultEntry matches
             ]
 
 
